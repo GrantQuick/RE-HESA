@@ -1,5 +1,5 @@
 ## RE-HESA
-A script for generating the XML for the C17071 Graduate Outcomes submission in the schema defined by C17071.xsd.
+A script for generating the XML for the C17071 HESA Graduate Outcomes submission in the schema defined by C17071.xsd, using data stored in Raiser's Edge.
 
 ## Getting Started
 These instructions will describe how to extract the relevant data from Raiser's Edge (RE) and subsequently use the script to translate the data into the XML schema defined by HESA.
@@ -68,49 +68,49 @@ It is recommended that as part of the source file generation, an initial base qu
 As an example, the following query definitions will produce the necessary output for use by the PowerShell script:
 
 **Base Query**
-Query type: Constituent
-Query format: Dynamic
-Criteria: Primary Education Class of equals 2017
+- Query type: Constituent
+- Query format: Dynamic
+- Criteria: Primary Education Class of equals 2017
 
 **Bio Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Output: Constituent ID, First Name, Middle Name, Surname, Maiden Name, Deceased
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Output: Constituent ID, First Name, Middle Name, Surname, Maiden Name, Deceased
 
 **Reg No Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Criteria: Alias Type equals Registration Number
-Output: Constituent ID, Alias Type, Alias
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Criteria: Alias Type equals Registration Number
+- Output: Constituent ID, Alias Type, Alias
 
 **Address Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Output: Constituent ID, Address Line 1, Address Line 2, Address Line 3, Address Line 4, Address Line 5, City, Postcode, Country, Address Type, Preferred, Valid Date From, Valid Date To
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Output: Constituent ID, Address Line 1, Address Line 2, Address Line 3, Address Line 4, Address Line 5, City, Postcode, Country, Address Type, Preferred, Valid Date From, Valid Date To
 
 **Emails Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Criteria: Phone Type equals Email AND Phone Number not blank
-Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Criteria: Phone Type equals Email AND Phone Number not blank
+- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
 
 **Mobiles Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Criteria: Phone Type equals Mobile AND Phone Number not blank
-Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Criteria: Phone Type equals Mobile AND Phone Number not blank
+- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
 
 **Phones Query**
-Query type: Constituent
-Query format: Dynamic
-Select from: Base Query
-Criteria: Phone Type equals Phone AND Phone Number not blank
-Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Criteria: Phone Type equals Phone AND Phone Number not blank
+- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
 
 All queries with the exception of the base query will need to be saved as CSV files (by clicking the Export button in the query window) and stored locally in an appropriate folder.
 
