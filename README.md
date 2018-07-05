@@ -5,7 +5,7 @@ A script for generating the XML for the C17071 HESA Graduate Outcomes submission
 These instructions will describe how to extract the relevant data from Raiser's Edge (RE) and subsequently use the script to translate the data into the XML schema defined by HESA.
 
 ### Configuring PowerShell to run scripts
-You will need to be able to run PowerShell scripts on your computer. You may initially need to alter the execution poilicy for your PowerShell installation in order to run scripts. To do this, start PowerShell as an administrator then run the following command:
+You will need to be able to run PowerShell scripts on your computer. You may initially need to alter the execution policy for your PowerShell installation in order to run scripts. To do this, start PowerShell as an administrator then run the following command:
 ```
 Set-ExecutionPolicy RemoteSigned
 ```
