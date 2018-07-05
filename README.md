@@ -32,7 +32,7 @@ The source files need to contain the following fields as a minimum:
 * Registration Number file
     1. Constituent ID
     2. Alias (This is the student registration number. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the registration nubmer should still be output into the csv with a column heading of Alias)
-* Addresses
+* Addresses file
     1. Constituent ID
     2. Address Line 1
     3. Address Line 2
@@ -43,19 +43,19 @@ The source files need to contain the following fields as a minimum:
     8. Postcode
     9. Country
     10. Preferred
-* Emails
+* Emails file
     1. Constituent ID
     2. Phone Type
     3. Phone Number
     4. Phone Inactive
     5. Phone Is Primary?
-* Mobiles
+* Mobiles file
     1. Constituent ID
     2. Phone Type
     3. Phone Number
     4. Phone Inactive
     5. Phone Is Primary?
-* Phones
+* Phones file
     1. Constituent ID
     2. Phone Type
     3. Phone Number
