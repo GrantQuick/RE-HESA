@@ -31,7 +31,7 @@ The source files need to contain the following fields as a minimum:
     6. Deceased
 * Registration Number file
     1. Constituent ID
-    2. Alias (This is the student registration number. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the registration nubmer should still be output into the csv with a column heading of Alias)
+    2. Alias (This is the student registration number. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the registration number should still be output into the csv with a column heading of Alias)
 * Addresses file
     1. Constituent ID
     2. Address Line 1
@@ -140,8 +140,8 @@ The script will iterate through the constituent data in the csv files and produc
 
 ## Known Issues
 The script does not currently handle:
-* International phone numbers - the script will at some point be modified to put international phone numbers in the corrext XML tag. Currently, as our data in RE does not distinguish between UK and international phone numbers, so handling of this data is not possible. This is planned for a future update.
-* Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have bben implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
+* International phone numbers - the script will at some point be modified to put international phone numbers in the correct XML tag. Currently, our data in RE does not distinguish between UK and international phone numbers, so handling of this data is not possible. This is planned for a future update.
+* Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have been implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
 
 
 ## Authors
