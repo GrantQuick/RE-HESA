@@ -14,6 +14,7 @@ Set-ExecutionPolicy RemoteSigned
 The script uses several files from data stored in RE. The data is extracted using the RE Query tool. The script needs the following files in order to run:
 * A CSV containing biographical information (Bio file).
 * A CSV containing the registration number of the student (Registration Number file).
+* A CSV containing the HESA unique student identifier of the student (HUSID file).
 * A CSV containing valid addresses for the graduates (Addresses file).
 * A CSV containing valid email addresses for the graduates (Emails file).
 * A CSV containing valid mobile phone numbers for the graduates (Mobiles file).
@@ -31,7 +32,10 @@ The source files need to contain the following fields as a minimum:
     6. Deceased
 * Registration Number file
     1. Constituent ID
-    2. Alias (This is the student registration number. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the registration nubmer should still be output into the csv with a column heading of Alias)
+    2. Alias (This is the student registration number. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the registration number should still be output into the csv with a column heading of Alias)
+* HUSID file
+    1. Constituent ID
+    2. Alias (This is the value of the HESA unique student identifier. In my organisation the student registration number is stored in RE as an Alias. If this is not the case in your organisation, the HUSID should still be output into the csv with a column heading of Alias)
 * Addresses file
     1. Constituent ID
     2. Address Line 1
@@ -55,12 +59,14 @@ The source files need to contain the following fields as a minimum:
     3. Phone Number
     4. Phone Inactive
     5. Phone Is Primary?
+    6. Phone Comments
 * Phones file
     1. Constituent ID
     2. Phone Type
     3. Phone Number
     4. Phone Inactive
     5. Phone Is Primary?
+    6. Phone Comments
 
 ### Creating the source files
 It is recommended that as part of the source file generation, an initial base query is created in RE to produce the dataset of constituents who should appear on any given HESA submission. This base query can be used as the source for each of the subsequent queries to ensure that each will return data on the same group of people. For example, you may wish to create a base query that returns all constituents from the class of 2017 and use that as the foundation for all other queries. To do this, when creating the other queries in RE, go to Tools > Query Options > Record Processing > Tick Select from query and choose your base query.
@@ -85,6 +91,13 @@ As an example, the following query definitions will produce the necessary output
 - Criteria: Alias Type equals Registration Number
 - Output: Constituent ID, Alias Type, Alias
 
+**HUSID Query**
+- Query type: Constituent
+- Query format: Dynamic
+- Select from: Base Query
+- Criteria: Alias Type equals HUSID
+- Output: Constituent ID, Alias Type, Alias
+
 **Address Query**
 - Query type: Constituent
 - Query format: Dynamic
@@ -103,14 +116,14 @@ As an example, the following query definitions will produce the necessary output
 - Query format: Dynamic
 - Select from: Base Query
 - Criteria: Phone Type equals Mobile AND Phone Number not blank
-- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
+- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?, Phone Comments
 
 **Phones Query**
 - Query type: Constituent
 - Query format: Dynamic
 - Select from: Base Query
 - Criteria: Phone Type equals Phone AND Phone Number not blank
-- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?
+- Output: Constituent ID, Phone Type, Phone Number, Phone Inactive, Phone Is Primary?, Phone Comments
 
 All queries with the exception of the base query will need to be saved as CSV files (by clicking the Export button in the query window) and stored locally in an appropriate folder.
 
@@ -122,6 +135,7 @@ There are a number of parameters that will need to be configured at the beginnin
 * $emailPath - set this to the full file path of your exported email.csv file
 * $mobilePath - set this to the full file path of your exported mobile.csv file
 * $phonePath - set this to the full file path of your exported phone.csv file
+* $husidPath - set this to the full file path of your exported HUSID.csv file
 * $countryCodePath - set this to the full file path of the CSV of HESA valid country codes, downloadable from here: https://www.hesa.ac.uk/5272e752-eeca-4a78-8e51-f10da7363972
 * $generatedFile - set this to the full file path of the output file you would like to create
 * $ukPrnValue - set this to the UK PRN value for your institution, available via https://www.ukrlp.co.uk/
@@ -138,9 +152,11 @@ Run the script by:
 ```
 The script will iterate through the constituent data in the csv files and produce an XML output file in the location you specified.
 
+## Phone Numbers - Additional Information
+In order to meet HESA submission requirements, phone numbers have to be classified as either UK Mobiles, UK Landlines or International Phones (either Mobiles or Landlines). In my organisation we have not historically identified phone numbers as being domestic or international. For the purposes of HESA submissions, for the most recent graduates we have begun to record this information within the Comments field for each international phone number. The Powershell script processes the Mobiles.csv and Phones.csv, and separates out any numbers that have the word **International** in the Comments field into INTTELs, while the remaining phones and mobiles (i.e. those without International in the Comments field) will go into UKTEL and UKMOB elements of the resulting XML.
+
 ## Known Issues
 The script does not currently handle:
-* International phone numbers - the script will at some point be modified to put international phone numbers in the corrext XML tag. Currently, as our data in RE does not distinguish between UK and international phone numbers, so handling of this data is not possible. This is planned for a future update.
 * Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have bben implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
 
 

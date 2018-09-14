@@ -9,6 +9,7 @@ $addressPath = ''
 $emailPath = ''
 $mobilePath = ''
 $phonePath = ''
+$husidPath = ''
 
 # HESA coding files
 $countryCodePath =  ''
@@ -48,6 +49,8 @@ $countryList.Add('Russia','Russia [Russian Federation]')
 $countryList.Add('Cyprus','Cyprus (European Union)')
 $countryList.Add('Brunei','Brunei [Brunei Darussalam]')
 $countryList.Add('South Korea','Korea (South) [Korea, Republic of]')
+$countryList.Add('West Bank Via Israel','Occupied Palestinian Territories [Palestine, State of] {formerly West Bank (including East Jerusalem) and Gaza Strip}')
+$countryList.Add('Portugal','Portugal {includes Madeira, Azores}')
 
 
 #####################################################
@@ -114,10 +117,8 @@ function Get-AddressAndCountryCodes([string]$addressPathP, [string]$countryCodeP
 }
 
 # Test mobile/ukphone values
-function Test-Phones ([string]$phonePathP,[string]$phoneType)
+function Test-Phones ([object[]]$phoneFile,[string]$phoneType)
 {
-    $phoneFile = Import-Csv -Path $phonePathP
-
     $phones = @()
 
     foreach ($phoneNo in $phoneFile)
@@ -125,7 +126,8 @@ function Test-Phones ([string]$phonePathP,[string]$phoneType)
         $phoneNo | Add-Member -NotePropertyName TestResult -NotePropertyValue ''
         $testResult = switch ( $phoneNo."Phone Number" )
         {
-            {$($phoneNo."Phone Number") -notmatch '^\d{11}$'} { "Not 11 digits long or contains invalid character" }
+            {$($phoneNo."Phone Number") -notmatch '^\d{11}$' -and $phoneType -ne "International"} { "Not 11 digits long or contains invalid character" }
+            {$($phoneNo."Phone Number") -notmatch '^\d{1,17}$' -and $phoneType -eq "International"} { "Not up to 17 digits long or contains invalid character" }
             default { "Pass" }
         }
         $phoneNo.TestResult = $testResult
@@ -147,10 +149,15 @@ function Test-Phones ([string]$phonePathP,[string]$phoneType)
             $headingString = "UKTEL(s) that will be rejected by HESA:"
             $getInputString = "$failedPhones UKTEL(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
         }
-        else
+        if ($phoneType -eq "Mobile")
         {
             $headingString = "UKMOB(s) that will be rejected by HESA:"
             $getInputString = "$failedPhones UKMOB(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
+        }
+        else 
+        {
+            $headingString = "INTTEL(s) that will be rejected by HESA:"
+            $getInputString = "$failedPhones INTTEL(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"    
         }
 
         write-host $headingString
@@ -159,7 +166,13 @@ function Test-Phones ([string]$phonePathP,[string]$phoneType)
         $confirmation = Read-Host $getInputString 
         while($confirmation -ne "y")
         {
-            if ($confirmation -eq 'n') {exit}
+            if ($confirmation -eq 'n') 
+            {
+                Write-Host "`n"
+                Write-Host "Rejected numbers:"
+                $phones | Where-Object -Property TestResult -ne 'Pass'| Select-Object -Property "Constituent ID","Phone Number","Phone Comments"
+                exit
+            }
             $confirmation = Read-Host "Please press y or n [y/n]"
         }
     }
@@ -203,13 +216,14 @@ $filePaths.Add('Emails',$emailPath)
 $filePaths.Add('Mobiles',$mobilePath)
 $filePaths.Add('Phones',$phonePath)
 $filePaths.Add('Country Codes',$countryCodePath)
+$filePaths.Add('HUSIDs',$husidPath)
 
 # Check the source files exist
 foreach ($sourceFile in $filePaths.values)
 {
     if (-not (Test-Path $sourceFile))
     {
-        Write-Host "Please check the loacation for the" $($filePaths.GetEnumerator() | Where-Object { $_.Value -eq $sourceFile }).Key "csv is a valid file path"
+        Write-Host "Please check the location for the" $($filePaths.GetEnumerator() | Where-Object { $_.Value -eq $sourceFile }).Key "csv is a valid file path"
         $testFail = $true
     }
 }
@@ -230,13 +244,25 @@ $ukAddresses = $addressesAndCodes |
     -or ($_.CountryCode -eq 'XK') `
     } | Sort-Object -Property "Constituent ID", Preferred -Descending
 
-$mobileNumbers = Test-Phones $mobilePath "Mobile"
-$phoneNumbers = Test-Phones $phonePath "Phone"
+# Import the phone files
+$mobileFile = Import-Csv -Path $mobilePath
+$phoneFile = Import-Csv -Path $phonePath
+$ukMobiles = $mobileFile | Where-Object -Property "Phone Comments" -ne "International"
+$ukPhones = $phoneFile | Where-Object -Property "Phone Comments" -ne "International"
+$intMobiles = $mobileFile | Where-Object -Property "Phone Comments" -eq "International"
+$intLandlines = $phoneFile | Where-Object -Property "Phone Comments" -eq "International"
+$internationalPhones = $intMobiles + $intLandlines
 
+# Check and return valid phone numbers
+$mobileNumbers = Test-Phones $ukMobiles "Mobile"
+$phoneNumbers = Test-Phones $ukPhones "Phone"
+$internationalNumbers = Test-Phones $internationalPhones "International"
+
+# Import the remaining files
 $bioFile = Import-Csv -Path $bioPath
 $regNoFile = Import-Csv -Path $regNoPath
 $emailFile = Import-Csv -Path $emailPath
-#$phoneFile = Import-Csv -Path $phonePath
+$husidFile = Import-Csv -Path $husidPath
 
 # Document creation
 [xml]$xmlDoc = New-Object system.Xml.XmlDocument
@@ -271,11 +297,21 @@ foreach ($bio in $bioFile)
     # UKTEL - Get a list of mobiles for this constituent
     $uktelValues = Get-Phones $phoneNumbers $bio.'Constituent ID'
 
+    # INTTEL - Get a list of mobiles for this constituent
+    $inttelValues = Get-Phones $internationalNumbers $bio.'Constituent ID'
+
     # EMAIL - Get a list of emails for this constituent
     $emailValues = Get-Phones $emailFile $bio.'Constituent ID'
 
     # HUSID
-    Add-SubElement $xmlDoc $xmlElt "HUSID" "TODO: Value for HUSID"
+    foreach ($husid in $husidFile)
+    {
+        if ($($husid."Constituent ID") -eq $($bio.'Constituent ID'))
+        {
+            Add-SubElement $xmlDoc $xmlElt "HUSID" $($husid.Alias)
+            break > $null
+        }
+    }
     
     # OWNSTU
     Add-SubElement $xmlDoc $xmlElt "OWNSTU" $($bio."Constituent ID")
@@ -312,25 +348,22 @@ foreach ($bio in $bioFile)
     Add-SubElement $xmlDoc $xmlElt "FNAMES" $($($bio.'First Name') + ' ' + $($bio.'Middle Name')).Trim()
     
     # FNMECHANGE
+    # Not recorded in RE by my organisation
     # Add-SubElement $xmlDoc $xmlElt "FNMECHANGE" "TODO: Value for FNMECHANGE"
 
     # GRADSTATUS
-    # TODO: Need to provide a value of 02 if there is no valid email or telephone record for a graduate
-    # Need to sort out international telephone records
+    # Provide a value of 02 if there is no valid email or telephone record for a graduate
     $gradStatus = ''
     if ($bio.Deceased -eq 'Yes')
     {
         $gradStatus = '01'
         Add-SubElement $xmlDoc $xmlElt "GRADSTATUS" $gradStatus
     }
-    elseif (($ukmobValues.Length -eq 0) -and ($uktelValues.Length -eq 0) -and ($emailValues.Length -eq 0) ) #TODO: Needs to incorporate INTTEL
+    elseif (($ukmobValues.Length -eq 0) -and ($uktelValues.Length -eq 0) -and ($inttelValues.Length -eq 0) -and ($emailValues.Length -eq 0) )
     {
         $gradStatus = '02'
         Add-SubElement $xmlDoc $xmlElt "GRADSTATUS" $gradStatus
     }
-    
-    # INTTEL
-    #Add-SubElement $xmlDoc $xmlElt "INTTEL" "TODO: Value for INTTEL"
 
     # SNAMECHANGE
     if ($bio.'Maiden Name' -ne '')
@@ -352,35 +385,39 @@ foreach ($bio in $bioFile)
     {
         Add-SubElement $xmlDoc $xmlElt "UKMOB" $ukmobValue
     }
+
+    # INTTEL - Add any values that were found for the current constituent
+    foreach ($inttelValue in $inttelValues)
+    {
+        Add-SubElement $xmlDoc $xmlElt "INTTEL" $inttelValue
+    }
     
-    # TODO: PostalAddress
+    # PostalAddress
     # DOES NOT FILTER OUT INVALID/PREVIOUS ADDRESSES
-    # Include all addresses. Enforces a maximum of 2 addresses
-    # This will need to be fixed in the source file.
+    # Include all addresses. Enforces a maximum of 2 addresses as per HESA spec.
+    # If more than 2 addresses exist for a constituent, the source file should
+    # be edited manually to only include the 2 most pertinent addresses.
 
     if ($gradStatus -eq '02' )
     {
         $xmlEltPostal = $xmlDoc.CreateElement("PostalAddress")
+        $j = 1
         foreach ($ukAddr in $ukAddresses)
         {
+            if ($j -gt 2) {continue}
             if ($($ukAddr."Constituent ID") -eq $($bio.'Constituent ID'))
             {
-                $j = 1
-                do 
-                {
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN1" $($ukAddr."Address Line 1")
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN2" $($ukAddr."Address Line 2")
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN3" $($ukAddr."Address Line 3")
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN4" $($ukAddr."Address Line 4")
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN5" $($ukAddr."Address Line 5")
-                    Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN6" $($ukAddr.City)
-                    Add-SubElement $xmlDoc $xmlEltPostal "POSTCODE" $($ukAddr.Postcode)
-                    $j++
-                } while ($j -le 2)
-                
-                
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN1" $($ukAddr."Address Line 1")
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN2" $($ukAddr."Address Line 2")
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN3" $($ukAddr."Address Line 3")
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN4" $($ukAddr."Address Line 4")
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN5" $($ukAddr."Address Line 5")
+                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN6" $($ukAddr.City)
+                Add-SubElement $xmlDoc $xmlEltPostal "POSTCODE" $($ukAddr.Postcode)
+                $j++
             }
         }
+        
         [void]$xmlDoc.LastChild.AppendChild($xmlEltPostal);
     }    
     
