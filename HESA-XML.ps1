@@ -15,7 +15,7 @@ $husidPath = ''
 $countryCodePath =  ''
 
 # XML output file
-$generatedFile = 'c:\temp\hesa.xml'
+$generatedFile = 'C:\temp\hesa.xml'
 
 # RECID
 $recIdValue = '17071' # (this is unlikely to change)
@@ -31,10 +31,10 @@ $ukPrnValue = ''
 # Sep       September to November
 $censusValue = 'Jun'
 
-<# 
-Add any countries to this list for which the country name in 
+<#
+Add any countries to this list for which the country name in
 RE may correspond to, but not match exactly, the country name as
-listed in the C17071 valid-entries.csv list of countries and codes 
+listed in the C17071 valid-entries.csv list of countries and codes
 #>
 $countryList = @{}
 $countryList.Add('','BLANK')
@@ -57,13 +57,13 @@ $countryList.Add('Portugal','Portugal {includes Madeira, Azores}')
 # Function definitions
 #####################################################
 
-<# 
+<#
 Check the country field matches one of the
 values in the country code file from HESA and
-add the HESA country code to each address object. 
+add the HESA country code to each address object.
 #>
 function Get-AddressAndCountryCodes([string]$addressPathP, [string]$countryCodePathP){
-    
+
     $countryCodeFile = Import-Csv -Path $countryCodePathP
     $addressFile = Import-Csv -Path $addressPathP
 
@@ -71,7 +71,7 @@ function Get-AddressAndCountryCodes([string]$addressPathP, [string]$countryCodeP
 
     foreach ($address in $addressFile)
     {
-        
+
         # Rename the countries as per the valid-entries.csv country codes
         if( $countryList.ContainsKey($address.Country) )
         {
@@ -85,7 +85,7 @@ function Get-AddressAndCountryCodes([string]$addressPathP, [string]$countryCodeP
             if ($address.Country -eq $code.Label)
             {
                 $address.CountryCode = $code.Code
-                break > $null 
+                break > $null
             }
         }
         $addresses += $address
@@ -154,19 +154,19 @@ function Test-Phones ([object[]]$phoneFile,[string]$phoneType)
             $headingString = "UKMOB(s) that will be rejected by HESA:"
             $getInputString = "$failedPhones UKMOB(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
         }
-        else 
+        else
         {
             $headingString = "INTTEL(s) that will be rejected by HESA:"
-            $getInputString = "$failedPhones INTTEL(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"    
+            $getInputString = "$failedPhones INTTEL(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
         }
 
         write-host $headingString
         Write-Host ($testPhones | Format-Table | Out-String)
 
-        $confirmation = Read-Host $getInputString 
+        $confirmation = Read-Host $getInputString
         while($confirmation -ne "y")
         {
-            if ($confirmation -eq 'n') 
+            if ($confirmation -eq 'n')
             {
                 Write-Host "`n"
                 Write-Host "Rejected numbers:"
@@ -230,13 +230,13 @@ foreach ($sourceFile in $filePaths.values)
 
 if ($testFail)
 {
-    break  > $null 
+    break  > $null
 }
 
 $addressesAndCodes = Get-AddressAndCountryCodes $addressPath $countryCodePath
 
 # Filter out non-UK addresses and sort by preferred = 'Yes'
-$ukAddresses = $addressesAndCodes | 
+$ukAddresses = $addressesAndCodes |
     Where-Object {($_.CountryCode -eq 'XF')  `
     -or ($_.CountryCode -eq 'XH') `
     -or ($_.CountryCode -eq 'XI') `
@@ -269,27 +269,24 @@ $husidFile = Import-Csv -Path $husidPath
 [void]$xmlDoc.LoadXml("<?xml version=`"1.0`" encoding=`"utf-8`"?><GRADUATEOUTCOMESCONTACTDETAILSRecord></GRADUATEOUTCOMESCONTACTDETAILSRecord>")
 
 # Create Provider Node
-$xmlElt = $xmlDoc.CreateElement("Provider")
+$xmlEltProv = $xmlDoc.CreateElement("Provider")
 
 # RECID
-Add-SubElement $xmlDoc $xmlElt "RECID" $recIdValue
+Add-SubElement $xmlDoc $xmlEltProv "RECID" $recIdValue
 
 # UKPRN
-Add-SubElement $xmlDoc $xmlElt "UKPRN" $ukPrnValue
+Add-SubElement $xmlDoc $xmlEltProv "UKPRN" $ukPrnValue
 
 # CENSUS
-Add-SubElement $xmlDoc $xmlElt "CENSUS" $censusValue
+Add-SubElement $xmlDoc $xmlEltProv "CENSUS" $censusValue
 
-# Add the node to the document
-[void]$xmlDoc.LastChild.AppendChild($xmlElt);
-
-
-# Create Graduate Node
+# Create Graduate Node and its sub elements
 $i = 0
 foreach ($bio in $bioFile)
 {
+
+    # Create the actual graduate node
     $xmlElt = $xmlDoc.CreateElement("Graduate")
-    [void]$xmlDoc.LastChild.AppendChild($xmlElt);
 
     # UKMOB - Get a list of phones for this constituent
     $ukmobValues = Get-Phones $mobileNumbers $bio.'Constituent ID'
@@ -312,7 +309,7 @@ foreach ($bio in $bioFile)
             break > $null
         }
     }
-    
+
     # OWNSTU
     Add-SubElement $xmlDoc $xmlElt "OWNSTU" $($bio."Constituent ID")
 
@@ -334,7 +331,7 @@ foreach ($bio in $bioFile)
         {
             $cCode = $($countryCode.CountryCode)
             Add-SubElement $xmlDoc $xmlElt "COUNTRY" $cCode
-            break  > $null 
+            break  > $null
         }
     }
 
@@ -346,9 +343,9 @@ foreach ($bio in $bioFile)
 
     # FNAMES
     Add-SubElement $xmlDoc $xmlElt "FNAMES" $($($bio.'First Name') + ' ' + $($bio.'Middle Name')).Trim()
-    
+
     # FNMECHANGE
-    # Not recorded in RE by my organisation
+    # Not recorded in RE by Aberystwyth University
     # Add-SubElement $xmlDoc $xmlElt "FNMECHANGE" "TODO: Value for FNMECHANGE"
 
     # GRADSTATUS
@@ -379,7 +376,7 @@ foreach ($bio in $bioFile)
     {
         Add-SubElement $xmlDoc $xmlElt "UKTEL" $uktelValue
     }
-    
+
     # UKMOB - Add any values that were found for the current constituent
     foreach ($ukmobValue in $ukmobValues)
     {
@@ -391,7 +388,7 @@ foreach ($bio in $bioFile)
     {
         Add-SubElement $xmlDoc $xmlElt "INTTEL" $inttelValue
     }
-    
+
     # PostalAddress
     # DOES NOT FILTER OUT INVALID/PREVIOUS ADDRESSES
     # Include all addresses. Enforces a maximum of 2 addresses as per HESA spec.
@@ -417,15 +414,22 @@ foreach ($bio in $bioFile)
                 $j++
             }
         }
-        
-        [void]$xmlDoc.LastChild.AppendChild($xmlEltPostal);
-    }    
-    
+        # Add the Postal Address to the Graduate node
+        [void]$xmlElt.AppendChild($xmlEltPostal);
+    }
+
+    # Add the Provider and all sub elements
+    [void]$xmlEltProv.AppendChild($xmlElt)
+
     $i += 1
     # Clear-Host
     Write-Host "Processing record $i of $($bioFile.Count)"
     # Write-Progress -Activity "Generating XML" -status "Processing record $i" -percentComplete ($i / $($bioFile.Count)*100)
 }
+
+
+# Add the node to the document
+[void]$xmlDoc.LastChild.AppendChild($xmlEltProv);
 
 # Store to a file
 $xmlDoc.Save($generatedFile)

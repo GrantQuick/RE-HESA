@@ -157,7 +157,7 @@ In order to meet HESA submission requirements, phone numbers have to be classifi
 
 ## Known Issues
 The script does not currently handle:
-* Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have bben implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
+* Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have been implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
 
 ## Authors
 * **Grant Quick** - *Initial work* - [GrantQuick](https://github.com/GrantQuick)
