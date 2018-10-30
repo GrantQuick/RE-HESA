@@ -29,7 +29,7 @@ $ukPrnValue = ''
 # Mar       March to May
 # Jun       June to August
 # Sep       September to November
-$censusValue = 'Jun'
+$censusValue = 'Dec'
 
 <#
 Add any countries to this list for which the country name in
@@ -310,15 +310,15 @@ foreach ($bio in $bioFile)
         }
     }
 
-    # OWNSTU
-    Add-SubElement $xmlDoc $xmlElt "OWNSTU" $($bio."Constituent ID")
+    # # FEPUSID
+    # Add-SubElement $xmlDoc $xmlElt "FEPUSID" $($bio."Constituent ID")
 
-    # FEPUSID
+    # OWNSTU
     foreach ($regNo in $regNoFile)
     {
         if ($($regNo."Constituent ID") -eq $($bio.'Constituent ID'))
         {
-            Add-SubElement $xmlDoc $xmlElt "FEPUSID" $($regNo.Alias)
+            Add-SubElement $xmlDoc $xmlElt "OWNSTU" $($regNo.Alias)
             break > $null
         }
     }
@@ -362,10 +362,16 @@ foreach ($bio in $bioFile)
         Add-SubElement $xmlDoc $xmlElt "GRADSTATUS" $gradStatus
     }
 
-    # SNAMECHANGE
+    # INTTEL - Add any values that were found for the current constituent
+    foreach ($inttelValue in $inttelValues)
+    {
+        Add-SubElement $xmlDoc $xmlElt "INTTEL" $inttelValue
+    }
+
+    # SNAMECHNGE
     if ($bio.'Maiden Name' -ne '')
     {
-        Add-SubElement $xmlDoc $xmlElt "SNAMECHANGE" $($bio.'Maiden Name')
+        Add-SubElement $xmlDoc $xmlElt "SNAMECHNGE" $($bio.'Maiden Name')
     }
 
     # SURNAME
@@ -381,12 +387,6 @@ foreach ($bio in $bioFile)
     foreach ($ukmobValue in $ukmobValues)
     {
         Add-SubElement $xmlDoc $xmlElt "UKMOB" $ukmobValue
-    }
-
-    # INTTEL - Add any values that were found for the current constituent
-    foreach ($inttelValue in $inttelValues)
-    {
-        Add-SubElement $xmlDoc $xmlElt "INTTEL" $inttelValue
     }
 
     # PostalAddress
