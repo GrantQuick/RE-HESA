@@ -404,13 +404,14 @@ foreach ($bio in $bioFile)
             if ($j -gt 2) {continue}
             if ($($ukAddr."Constituent ID") -eq $($bio.'Constituent ID'))
             {
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN1" $($ukAddr."Address Line 1")
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN2" $($ukAddr."Address Line 2")
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN3" $($ukAddr."Address Line 3")
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN4" $($ukAddr."Address Line 4")
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN5" $($ukAddr."Address Line 5")
-                Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN6" $($ukAddr.City)
-                Add-SubElement $xmlDoc $xmlEltPostal "POSTCODE" $($ukAddr.Postcode)
+                if ($($ukAddr."Address Line 1")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN1" $($ukAddr."Address Line 1") }
+                if ($($ukAddr."Address Line 2")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN2" $($ukAddr."Address Line 2") }
+                if ($($ukAddr."Address Line 3")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN3" $($ukAddr."Address Line 3") }
+                if ($($ukAddr."Address Line 4")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN4" $($ukAddr."Address Line 4") }
+                if ($($ukAddr."Address Line 5")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN5" $($ukAddr."Address Line 5") }
+                if ($($ukAddr.City)) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN6" $($ukAddr.City) }
+                if ($($ukAddr.Postcode)) { Add-SubElement $xmlDoc $xmlEltPostal "POSTCODE" $($ukAddr.Postcode) }
+                
                 $j++
             }
         }
