@@ -154,7 +154,7 @@ function Test-Phones ([object[]]$phoneFile,[string]$phoneType)
             $headingString = "UKMOB(s) that will be rejected by HESA:"
             $getInputString = "$failedPhones UKMOB(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
         }
-        else
+        if ($phoneType -eq "International")
         {
             $headingString = "INTTEL(s) that will be rejected by HESA:"
             $getInputString = "$failedPhones INTTEL(s) do not meet the criteria specified by HESA. Do you wish to continue generating the xml? [y/n]"
