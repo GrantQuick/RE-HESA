@@ -51,7 +51,7 @@ $countryList.Add('Brunei','Brunei [Brunei Darussalam]')
 $countryList.Add('South Korea','Korea (South) [Korea, Republic of]')
 $countryList.Add('West Bank Via Israel','Occupied Palestinian Territories [Palestine, State of] {formerly West Bank (including East Jerusalem) and Gaza Strip}')
 $countryList.Add('Portugal','Portugal {includes Madeira, Azores}')
-
+$countryList.Add('Taiwan','Taiwan [Taiwan, Province of China]')
 
 #####################################################
 # Function definitions
@@ -251,7 +251,7 @@ $ukMobiles = $mobileFile | Where-Object -Property "Phone Comments" -ne "Internat
 $ukPhones = $phoneFile | Where-Object -Property "Phone Comments" -ne "International"
 $intMobiles = $mobileFile | Where-Object -Property "Phone Comments" -eq "International"
 $intLandlines = $phoneFile | Where-Object -Property "Phone Comments" -eq "International"
-$internationalPhones = $intMobiles + $intLandlines
+$internationalPhones = [array]$intMobiles + [array]$intLandlines
 
 # Check and return valid phone numbers
 $mobileNumbers = Test-Phones $ukMobiles "Mobile"
