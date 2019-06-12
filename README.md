@@ -136,7 +136,7 @@ There are a number of parameters that will need to be configured at the beginnin
 * $mobilePath - set this to the full file path of your exported mobile.csv file
 * $phonePath - set this to the full file path of your exported phone.csv file
 * $husidPath - set this to the full file path of your exported HUSID.csv file
-* $countryCodePath - set this to the full file path of the CSV of HESA valid country codes, downloadable from here: https://www.hesa.ac.uk/5272e752-eeca-4a78-8e51-f10da7363972
+* $countryCodePath - set this to the full file path of the CSV of HESA valid country codes, downloadable from here: https://www.hesa.ac.uk/9acccac5-921c-4ef6-838c-084057978258
 * $generatedFile - set this to the full file path of the output file you would like to create
 * $ukPrnValue - set this to the UK PRN value for your institution, available via https://www.ukrlp.co.uk/
 * $censusValue - set this to the value of the submission period. Valid entries are available here: https://www.hesa.ac.uk/collection/c17071/a/census
