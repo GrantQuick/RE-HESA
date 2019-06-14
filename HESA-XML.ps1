@@ -25,11 +25,11 @@ $ukPrnValue = ''
 
 # Value should be one of:
 # CODE      LABEL
-# Dec       December to February
-# Mar       March to May
-# Jun       June to August
-# Sep       September to November
-$censusValue = 'Dec'
+# Dec       December to February    Cohort A
+# Mar       March to May            Cohort B
+# Jun       June to August          Cohort C
+# Sep       September to November   Cohort D
+$censusValue = 'Sep'
 
 <#
 Add any countries to this list for which the country name in
@@ -52,6 +52,7 @@ $countryList.Add('South Korea','Korea (South) [Korea, Republic of]')
 $countryList.Add('West Bank Via Israel','Occupied Palestinian Territories [Palestine, State of] {formerly West Bank (including East Jerusalem) and Gaza Strip}')
 $countryList.Add('Portugal','Portugal {includes Madeira, Azores}')
 $countryList.Add('Taiwan','Taiwan [Taiwan, Province of China]')
+$countryList.Add('Bahamas','Bahamas, The')
 
 #####################################################
 # Function definitions
@@ -128,6 +129,33 @@ function Test-Phones ([object[]]$phoneFile,[string]$phoneType)
         {
             {$($phoneNo."Phone Number") -notmatch '^\d{11}$' -and $phoneType -ne "International"} { "Not 11 digits long or contains invalid character" }
             {$($phoneNo."Phone Number") -notmatch '^\d{1,17}$' -and $phoneType -eq "International"} { "Not up to 17 digits long or contains invalid character" }
+            {
+                ($phoneType -eq "Mobile") -and 
+                -not ($($phoneNo."Phone Number").StartsWith('071')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('072')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('073')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('074')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('075')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('07624')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('077')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('078')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('079'))
+            } { "Not one of the valid mobile numbers as defined by HESA" }
+            {
+                ($phoneType -eq "Phone") -and 
+                -not ($($phoneNo."Phone Number").StartsWith('01')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('02')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('03')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('04')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('05')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('06')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('08')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('09')) -and 
+                -not ($($phoneNo."Phone Number").StartsWith('070'))
+            } { "Not one of the valid phone numbers as defined by HESA" }
+            {
+                ($phoneType -eq "International") -and -not ($($phoneNo."Phone Number").StartsWith('00'))
+            } { "International phone number does not start with 00" }
             default { "Pass" }
         }
         $phoneNo.TestResult = $testResult
@@ -397,13 +425,15 @@ foreach ($bio in $bioFile)
 
     if ($gradStatus -eq '02' )
     {
-        $xmlEltPostal = $xmlDoc.CreateElement("PostalAddress")
         $j = 1
         foreach ($ukAddr in $ukAddresses)
         {
             if ($j -gt 2) {continue}
+            
             if ($($ukAddr."Constituent ID") -eq $($bio.'Constituent ID'))
             {
+                $xmlEltPostal = $xmlDoc.CreateElement("PostalAddress")
+                
                 if ($($ukAddr."Address Line 1")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN1" $($ukAddr."Address Line 1") }
                 if ($($ukAddr."Address Line 2")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN2" $($ukAddr."Address Line 2") }
                 if ($($ukAddr."Address Line 3")) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN3" $($ukAddr."Address Line 3") }
@@ -412,11 +442,11 @@ foreach ($bio in $bioFile)
                 if ($($ukAddr.City)) { Add-SubElement $xmlDoc $xmlEltPostal "ADDRESSLN6" $($ukAddr.City) }
                 if ($($ukAddr.Postcode)) { Add-SubElement $xmlDoc $xmlEltPostal "POSTCODE" $($ukAddr.Postcode) }
                 
+                # Add the Postal Address to the Graduate node
+                [void]$xmlElt.AppendChild($xmlEltPostal);
                 $j++
             }
         }
-        # Add the Postal Address to the Graduate node
-        [void]$xmlElt.AppendChild($xmlEltPostal);
     }
 
     # Add the Provider and all sub elements
