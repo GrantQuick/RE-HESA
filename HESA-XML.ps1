@@ -1,27 +1,29 @@
 #####################################################
 # Parameters
+# Taken from config.json
 #####################################################
 
 # RE exported csv file paths
-$bioPath = ''
-$regNoPath = ''
-$addressPath = ''
-$emailPath = ''
-$mobilePath = ''
-$phonePath = ''
-$husidPath = ''
+$config = Get-Content ".\config.json" | ConvertFrom-Json
+$bioPath = ($config | Select-Object -Property "bioPath").bioPath
+$regNoPath = ($config | Select-Object -Property "regNoPath").regNoPath
+$addressPath = ($config | Select-Object -Property "addressPath").addressPath
+$emailPath = ($config | Select-Object -Property "emailPath").emailPath
+$mobilePath = ($config | Select-Object -Property "mobilePath").mobilePath
+$phonePath = ($config | Select-Object -Property "phonePath").phonePath
+$husidPath = ($config | Select-Object -Property "husidPath").husidPath
 
 # HESA coding files
-$countryCodePath =  ''
+$countryCodePath = ($config | Select-Object -Property "countryCodePath").countryCodePath
 
 # XML output file
-$generatedFile = 'C:\temp\hesa.xml'
+$generatedFile = ($config | Select-Object -Property "generatedFile").generatedFile
 
-# RECID
-$recIdValue = '17071' # (this is unlikely to change)
+# RECID (17071, unlikely to change)
+$recIdValue = ($config | Select-Object -Property "recIdValue").recIdValue
 
 # UKPRN
-$ukPrnValue = ''
+$ukPrnValue = ($config | Select-Object -Property "ukPrnValue").ukPrnValue
 
 # Value should be one of:
 # CODE      LABEL
@@ -29,30 +31,15 @@ $ukPrnValue = ''
 # Mar       March to May            Cohort B
 # Jun       June to August          Cohort C
 # Sep       September to November   Cohort D
-$censusValue = 'Sep'
+$censusValue = ($config | Select-Object -Property "censusValue").censusValue
 
 <#
-Add any countries to this list for which the country name in
+Add any countries to the list in config.json for which the country name in
 RE may correspond to, but not match exactly, the country name as
 listed in the C17071 valid-entries.csv list of countries and codes
 #>
-$countryList = @{}
-$countryList.Add('','BLANK')
-$countryList.Add('United States of America','United States')
-$countryList.Add('France','France {includes Corsica}')
-$countryList.Add('Trinidad & Tobago','Trinidad and Tobago')
-$countryList.Add('Hong Kong','Hong Kong (Special Administrative Region of China) [Hong Kong]')
-$countryList.Add('Saint Lucia','St Lucia')
-$countryList.Add('Spain','Spain {includes Ceuta, Melilla}')
-$countryList.Add('Italy','Italy {Includes Sardinia, Sicily}')
-$countryList.Add('Russia','Russia [Russian Federation]')
-$countryList.Add('Cyprus','Cyprus (European Union)')
-$countryList.Add('Brunei','Brunei [Brunei Darussalam]')
-$countryList.Add('South Korea','Korea (South) [Korea, Republic of]')
-$countryList.Add('West Bank Via Israel','Occupied Palestinian Territories [Palestine, State of] {formerly West Bank (including East Jerusalem) and Gaza Strip}')
-$countryList.Add('Portugal','Portugal {includes Madeira, Azores}')
-$countryList.Add('Taiwan','Taiwan [Taiwan, Province of China]')
-$countryList.Add('Bahamas','Bahamas, The')
+$countryList = ($config | Select-Object -Property "countryList").countryList
+
 
 #####################################################
 # Function definitions
@@ -72,11 +59,16 @@ function Get-AddressAndCountryCodes([string]$addressPathP, [string]$countryCodeP
 
     foreach ($address in $addressFile)
     {
+        # Handle any blank addresses
+        if($address.Country -eq '')
+        {
+            $address.Country = 'BLANK'
+        }
 
         # Rename the countries as per the valid-entries.csv country codes
-        if( $countryList.ContainsKey($address.Country) )
+        if( $countryList.PSobject.Properties.Name -contains $($address.Country) )
         {
-            $address.Country = $countryList[$address.Country]
+            $address.Country = $countryList.$($address.Country)
         }
 
         # Add a new property to the address object for the countrycode

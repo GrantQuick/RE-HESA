@@ -1,5 +1,5 @@
 ## RE-HESA
-A script for generating the XML for the C17071 HESA Graduate Outcomes submission in the schema defined by C17071.xsd, using data stored in Raiser's Edge.
+HESA-XML.ps1 is a script for generating the XML for the C17071 HESA Graduate Outcomes submission in the schema defined by C17071.xsd, using data stored in Raiser's Edge.
 
 ## Getting Started
 These instructions will describe how to extract the relevant data from Raiser's Edge (RE) and subsequently use the script to translate the data into the XML schema defined by HESA.
@@ -128,19 +128,19 @@ As an example, the following query definitions will produce the necessary output
 All queries with the exception of the base query will need to be saved as CSV files (by clicking the Export button in the query window) and stored locally in an appropriate folder.
 
 ### Configuring the PowerShell script
-There are a number of parameters that will need to be configured at the beginning of the PowerShell script:
-* $bioPath - set this to the full file path of your exported bio.csv file
-* $regNoPath - set this to the full file path of your exported regNo.csv file
-* $addressPath - set this to the full file path of your exported address.csv file
-* $emailPath - set this to the full file path of your exported email.csv file
-* $mobilePath - set this to the full file path of your exported mobile.csv file
-* $phonePath - set this to the full file path of your exported phone.csv file
-* $husidPath - set this to the full file path of your exported HUSID.csv file
-* $countryCodePath - set this to the full file path of the CSV of HESA valid country codes, downloadable from here: https://www.hesa.ac.uk/9acccac5-921c-4ef6-838c-084057978258
-* $generatedFile - set this to the full file path of the output file you would like to create
-* $ukPrnValue - set this to the UK PRN value for your institution, available via https://www.ukrlp.co.uk/
-* $censusValue - set this to the value of the submission period. Valid entries are available here: https://www.hesa.ac.uk/collection/c17071/a/census
-* $countryList - add any countries to this list for which the country name in RE may correspond to, but not match exactly, the country name as listed in the C17071 valid-entries.csv list of countries and codes. 
+The script is configured by altering the parameters in the config.json file. The following items need to be set:
+* bioPath - set this to the full file path of your exported bio.csv file
+* regNoPath - set this to the full file path of your exported regNo.csv file
+* addressPath - set this to the full file path of your exported address.csv file
+* emailPath - set this to the full file path of your exported email.csv file
+* mobilePath - set this to the full file path of your exported mobile.csv file
+* phonePath - set this to the full file path of your exported phone.csv file
+* husidPath - set this to the full file path of your exported HUSID.csv file
+* countryCodePath - set this to the full file path of the CSV of HESA valid country codes, downloadable from here: https://www.hesa.ac.uk/9acccac5-921c-4ef6-838c-084057978258
+* generatedFile - set this to the full file path of the output file you would like to create
+* ukPrnValue - set this to the UK PRN value for your institution, available via https://www.ukrlp.co.uk/
+* censusValue - set this to the value of the submission period. Valid entries are available here: https://www.hesa.ac.uk/collection/c17071/a/census
+* countryList - add any countries to this list for which the country name in RE may correspond to, but not match exactly, the country name as listed in the C17071 valid-entries.csv list of countries and codes. 
 
 ### Running the PowerShell script
 Run the script by:
@@ -158,6 +158,11 @@ In order to meet HESA submission requirements, phone numbers have to be classifi
 ## Known Issues
 The script does not currently handle:
 * Invalid data - some cursory checks on the data is performed by the script, but not all of HESAs requirements have be  en implemented. It is assumed that manual validation of the data returned by the RE queries will be necessary in all cases.
+
+## Bonus script
+Also now included is a script for refactoring the HESA XML cohort files into Excel documents for easy analysis and import into Excel. The xml source file and xlsx output destination file can be set in the config.json file using:
+* cohortFileForXmlRefactor - set this to the full file path for the downloaded cohort file
+* destinationForRefactoredCohortFile - set this to the full file path of the xlsx file you wish to create
 
 ## Authors
 * **Grant Quick** - *Initial work* - [GrantQuick](https://github.com/GrantQuick)

@@ -1,0 +1,33 @@
+{
+    "bioPath": "C:\\path\\to\\your\\Bio.CSV",
+    "regNoPath": "C:\\path\\to\\your\\RegNo.CSV",  
+    "addressPath": "C:\\path\\to\\your\\Address.CSV",
+    "emailPath": "C:\\path\\to\\your\\Email.CSV",
+    "mobilePath": "C:\\path\\to\\your\\Mobile.CSV",
+    "phonePath": "C:\\path\\to\\your\\Phone.CSV",
+    "husidPath": "C:\\path\\to\\your\\HUSID.CSV",
+    "countryCodePath": "C:\\path\\to\\your\\country_codes_valid-entries.csv",
+    "generatedFile": "C:\\path\\to\\where\\you\\want\\the\\generated\\xml\\file\\hesa.xml",
+    "recIdValue": "17071",
+    "ukPrnValue": "your_uk_prn_value",
+    "censusValue": "Sep",
+    "countryList": {
+        "United States of America": "United States",
+        "France": "France {includes Corsica}",
+        "Trinidad & Tobago": "Trinidad and Tobago",
+        "Hong Kong": "Hong Kong (Special Administrative Region of China) [Hong Kong]",
+        "Saint Lucia": "St Lucia",
+        "Spain": "Spain {includes Ceuta, Melilla}",
+        "Italy": "Italy {Includes Sardinia, Sicily}",
+        "Russia": "Russia [Russian Federation]",
+        "Cyprus": "Cyprus (European Union)",
+        "Brunei": "Brunei [Brunei Darussalam]",
+        "South Korea": "Korea (South) [Korea, Republic of]",
+        "West Bank Via Israel": "Occupied Palestinian Territories [Palestine, State of] {formerly West Bank (including East Jerusalem) and Gaza Strip}",
+        "Portugal": "Portugal {includes Madeira, Azores}",
+        "Taiwan": "Taiwan [Taiwan, Province of China]",
+        "Bahamas": "Bahamas, The"
+    },
+    "cohortFileForXmlRefactor": "C:\\path\\to\\the\\xml\\cohort\\file\\you\\want\\to\\convert\\to\\xlsx\\C17071_Jun_random_numbers.xml",
+    "destinationForRefactoredCohortFile": "C:\\path\\to\\the\\xlsx\\\\file\\you\\want\\to\\create\\Cohort_C.xlsx"
+}
