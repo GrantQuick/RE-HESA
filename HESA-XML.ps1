@@ -268,10 +268,13 @@ $ukAddresses = $addressesAndCodes |
 $mobileFile = Import-Csv -Path $mobilePath
 $phoneFile = Import-Csv -Path $phonePath
 $ukMobiles = $mobileFile | Where-Object -Property "Phone Comments" -ne "International"
+$ukMobiles = $ukMobiles.replace(' ','')
 $ukPhones = $phoneFile | Where-Object -Property "Phone Comments" -ne "International"
+$ukPhones = $ukPhones.replace(' ','')
 $intMobiles = $mobileFile | Where-Object -Property "Phone Comments" -eq "International"
 $intLandlines = $phoneFile | Where-Object -Property "Phone Comments" -eq "International"
 $internationalPhones = [array]$intMobiles + [array]$intLandlines
+$internationalPhones = $internationalPhones.replace(' ','')
 
 # Check and return valid phone numbers
 $mobileNumbers = Test-Phones $ukMobiles "Mobile"
