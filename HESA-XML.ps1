@@ -222,6 +222,14 @@ function Get-Phones ([object[]]$phoneArr,[string]$constituentID) {
     return $valueList
 }
 
+# Lose any spaces from the phone numbers (NXT automatically adds spaces to phone numbers)
+function Remove-Spaces ($array_of_phone_objects)
+{
+    foreach($phone in $array_of_phone_objects){
+        $phone.'Phone number' =  $($phone.'Phone number').replace(' ','')
+    }
+}
+
 #####################################################
 # Let's go
 #####################################################
@@ -268,13 +276,13 @@ $ukAddresses = $addressesAndCodes |
 $mobileFile = Import-Csv -Path $mobilePath
 $phoneFile = Import-Csv -Path $phonePath
 $ukMobiles = $mobileFile | Where-Object -Property "Phone Comments" -ne "International"
-$ukMobiles = $ukMobiles.replace(' ','')
+$ukMobiles = Remove-Spaces ($ukMobiles)
 $ukPhones = $phoneFile | Where-Object -Property "Phone Comments" -ne "International"
-$ukPhones = $ukPhones.replace(' ','')
+$ukPhones = Remove-Spaces ($ukPhones)
 $intMobiles = $mobileFile | Where-Object -Property "Phone Comments" -eq "International"
 $intLandlines = $phoneFile | Where-Object -Property "Phone Comments" -eq "International"
 $internationalPhones = [array]$intMobiles + [array]$intLandlines
-$internationalPhones = $internationalPhones.replace(' ','')
+$internationalPhones = Remove-Spaces ($internationalPhones)
 
 # Check and return valid phone numbers
 $mobileNumbers = Test-Phones $ukMobiles "Mobile"
