@@ -228,6 +228,7 @@ function Remove-Spaces ($array_of_phone_objects)
     foreach($phone in $array_of_phone_objects){
         $phone.'Phone number' =  $($phone.'Phone number').replace(' ','')
     }
+    return $array_of_phone_objects
 }
 
 #####################################################
@@ -275,6 +276,7 @@ $ukAddresses = $addressesAndCodes |
 # Import the phone files
 $mobileFile = Import-Csv -Path $mobilePath
 $phoneFile = Import-Csv -Path $phonePath
+
 $ukMobiles = $mobileFile | Where-Object -Property "Phone Comments" -ne "International"
 $ukMobiles = Remove-Spaces ($ukMobiles)
 $ukPhones = $phoneFile | Where-Object -Property "Phone Comments" -ne "International"
